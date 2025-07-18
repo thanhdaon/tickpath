@@ -47,7 +47,10 @@ export function PrioritySelector({ priorityId }: PrioritySelectorProps) {
             <PriorityIcon priorityId={value} />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="border-input w-full min-w-[var(--radix-popper-anchor-width)] p-0">
+        <PopoverContent
+          className="border-input w-full min-w-[var(--radix-popper-anchor-width)] p-0"
+          align="start"
+        >
           <Command>
             <CommandInput placeholder="Set priority..." />
             <CommandList>

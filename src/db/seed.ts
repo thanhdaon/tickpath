@@ -62,7 +62,7 @@ function generateIssues(): Issue[] {
     description: faker.lorem.words({ min: 3, max: 10 }),
     statusId: faker.helpers.arrayElement(statuses.map((s) => s.id)),
     priorityId: faker.helpers.arrayElement(priorities.map((p) => p.id)),
-    identifier: faker.string.uuid(),
+    identifier: generateIssueIdentifier(),
     createdAt: faker.date.recent(),
   }));
 }
@@ -73,6 +73,10 @@ function generateIssueLabels(issueIds: number[]): IssueLabel[] {
       .arrayElements(labelIds, { min: 1, max: 3 })
       .map((labelId) => ({ issueId, labelId }))
   );
+}
+
+function generateIssueIdentifier() {
+  return `TIPA-${faker.number.int({ min: 1000, max: 9999 })}`;
 }
 
 main()
