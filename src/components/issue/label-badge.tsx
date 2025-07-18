@@ -1,27 +1,50 @@
+import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { Badge } from "~/components/ui/badge";
-import { Label } from "~/data/labels";
+import { orpc } from "~/orpc/react-query";
 
 interface LabelBadgeProps {
-  label: Label[];
+  labels: string[];
 }
 
-export function LabelBadge({ label }: LabelBadgeProps) {
+export function LabelBadge({ labels }: LabelBadgeProps) {
   return (
     <>
-      {label.map((l) => (
-        <Badge
-          key={l.id}
-          variant="outline"
-          className="gap-1.5 rounded-full text-muted-foreground bg-background"
-        >
-          <span
-            className="size-1.5 rounded-full"
-            style={{ backgroundColor: l.color }}
-            aria-hidden="true"
-          />
-          {l.name}
-        </Badge>
+      {labels.map((labelId) => (
+        <LabelBadgeItem key={labelId} labelId={labelId} />
       ))}
     </>
+  );
+}
+
+function LabelBadgeItem({ labelId }: { labelId: string }) {
+  const result = useSuspenseQuery(orpc.labels.getAll.queryOptions());
+
+  if (result.isLoading) {
+    return null;
+  }
+
+  if (result.isError) {
+    return null;
+  }
+
+  const label = result.data.find((l) => l.id === labelId);
+
+  if (label === undefined) {
+    return null;
+  }
+
+  return (
+    <Badge
+      key={label.id}
+      variant="outline"
+      className="gap-1.5 rounded-full text-muted-foreground bg-background"
+    >
+      <span
+        className="size-1.5 rounded-full"
+        style={{ backgroundColor: label.color }}
+        aria-hidden="true"
+      />
+      {label.name}
+    </Badge>
   );
 }

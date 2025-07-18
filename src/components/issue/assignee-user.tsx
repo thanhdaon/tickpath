@@ -13,12 +13,12 @@ import {
 import { statusUserColors, User, users } from "~/data/users";
 
 interface AssigneeUserProps {
-  user: User | null;
+  userId: string | null;
 }
 
-export function AssigneeUser({ user }: AssigneeUserProps) {
+export function AssigneeUser({ userId }: AssigneeUserProps) {
   const [open, setOpen] = useState(false);
-  const [currentAssignee, setCurrentAssignee] = useState<User | null>(user);
+  const [currentAssignee, setCurrentAssignee] = useState<User | null>(userId);
 
   useEffect(() => {
     setCurrentAssignee(user);

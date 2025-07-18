@@ -1,4 +1,27 @@
-import { FC, SVGProps } from "react";
+import { SVGProps } from "react";
+
+export function PriorityIcon({
+  priorityId,
+  className,
+}: {
+  priorityId: string;
+  className?: string;
+}) {
+  switch (priorityId) {
+    case "no-priority":
+      return <NoPriorityIcon className={className} />;
+    case "urgent":
+      return <UrgentPriorityIcon className={className} />;
+    case "high":
+      return <HighPriorityIcon className={className} />;
+    case "medium":
+      return <MediumPriorityIcon className={className} />;
+    case "low":
+      return <LowPriorityIcon className={className} />;
+    default:
+      return null;
+  }
+}
 
 interface IconProps extends SVGProps<SVGSVGElement> {
   className?: string;
@@ -141,17 +164,3 @@ function LowPriorityIcon({ className, ...props }: IconProps) {
     </svg>
   );
 }
-
-export interface Priority {
-  id: string;
-  name: string;
-  icon: FC<SVGProps<SVGSVGElement>>;
-}
-
-export const priorities: Priority[] = [
-  { id: "no-priority", name: "No priority", icon: NoPriorityIcon },
-  { id: "urgent", name: "Urgent", icon: UrgentPriorityIcon },
-  { id: "high", name: "High", icon: HighPriorityIcon },
-  { id: "medium", name: "Medium", icon: MediumPriorityIcon },
-  { id: "low", name: "Low", icon: LowPriorityIcon },
-];

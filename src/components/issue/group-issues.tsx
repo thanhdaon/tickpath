@@ -1,8 +1,25 @@
 import { Plus } from "lucide-react";
 import { IssueLine } from "~/components/issue/issue-line";
+import { StatusIcon } from "~/components/issue/status-icon";
 import { Button } from "~/components/ui/button";
-import { Status } from "~/data/status";
-import { Issue } from "~/data/issues";
+
+type Status = {
+  id: string;
+  name: string;
+  color: string;
+};
+
+type Issue = {
+  title: string;
+  statusId: string;
+  id: number;
+  identifier: string;
+  description: string | null;
+  createdAt: Date;
+  assigneeId: string | null;
+  priorityId: string;
+  labels: string[];
+};
 
 interface GroupIssuesProps {
   status: Status;
@@ -16,7 +33,7 @@ export function GroupIssues({ status, count, issues }: GroupIssuesProps) {
       <div className="sticky top-0 z-10 bg-container w-full h-10">
         <div className="w-full h-full flex items-center justify-between px-6">
           <div className="flex items-center gap-2">
-            <status.icon />
+            <StatusIcon statusId={status.id} />
             <span className="text-sm font-medium">{status.name}</span>
             <span className="text-sm text-muted-foreground">{count}</span>
           </div>

@@ -1,17 +1,23 @@
 import appCss from "~/styles/app.css?url";
 
+import { QueryClient } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import {
-  createRootRoute,
+  createRootRouteWithContext,
   HeadContent,
   Outlet,
   Scripts,
 } from "@tanstack/react-router";
 import type { ReactNode } from "react";
-import { NotFound } from "~/components/not-found";
-import { getThemeServerFn } from "~/lib/theme";
 import { ThemeProvider, useTheme } from "~/components/theme-provider";
+import { getThemeServerFn } from "~/lib/theme";
 
-export const Route = createRootRoute({
+type Context = {
+  queryClient: QueryClient;
+};
+
+export const Route = createRootRouteWithContext<Context>()({
   head: () => ({
     meta: [
       { charSet: "utf-8" },
@@ -50,6 +56,8 @@ function RootDocument({ children }: { children: ReactNode }) {
       </head>
       <body>
         {children}
+        <TanStackRouterDevtools position="bottom-right" />
+        <ReactQueryDevtools buttonPosition="bottom-left" />
         <Scripts />
       </body>
     </html>

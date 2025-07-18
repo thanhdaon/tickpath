@@ -7,6 +7,7 @@ import * as othersSchema from "~/db/schema/others";
 const schema = { ...othersSchema, ...authSchema };
 
 type Issue = typeof schema.issues.$inferInsert;
+type IssueLabel = typeof schema.issuesLabels.$inferInsert;
 
 const labels = [
   { id: "ui", name: "UI Enhancement", color: "purple" },
@@ -21,6 +22,8 @@ const labels = [
   { id: "testing", name: "Testing", color: "teal" },
   { id: "internationalization", name: "Internationalization", color: "cyan" },
 ];
+
+const labelIds = labels.map((l) => l.id);
 
 const priorities = [
   { id: "no-priority", name: "No priority" },
@@ -46,6 +49,11 @@ async function main() {
   await db.insert(schema.priorities).values(priorities);
   await db.insert(schema.labels).values(labels);
   await db.insert(schema.issues).values(generateIssues());
+
+  const issues = await db.query.issues.findMany({ columns: { id: true } });
+  const issueIds = issues.map((issue) => issue.id);
+
+  await db.insert(schema.issuesLabels).values(generateIssueLabels(issueIds));
 }
 
 function generateIssues(): Issue[] {
@@ -57,6 +65,14 @@ function generateIssues(): Issue[] {
     identifier: faker.string.uuid(),
     createdAt: faker.date.recent(),
   }));
+}
+
+function generateIssueLabels(issueIds: number[]): IssueLabel[] {
+  return issueIds.flatMap((issueId) =>
+    faker.helpers
+      .arrayElements(labelIds, { min: 1, max: 3 })
+      .map((labelId) => ({ issueId, labelId }))
+  );
 }
 
 main()

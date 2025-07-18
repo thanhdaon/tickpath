@@ -1,13 +1,23 @@
-import { FC } from "react";
-
-export interface Status {
-  id: string;
-  name: string;
-  color: string;
-  icon: FC;
+export function StatusIcon({ statusId }: { statusId: string }) {
+  switch (statusId) {
+    case "backlog":
+      return <BacklogIcon />;
+    case "to-do":
+      return <ToDoIcon />;
+    case "in-progress":
+      return <InProgressIcon />;
+    case "technical-review":
+      return <TechnicalReviewIcon />;
+    case "completed":
+      return <CompletedIcon />;
+    case "paused":
+      return <PausedIcon />;
+    default:
+      return null;
+  }
 }
 
-export function BacklogIcon() {
+function BacklogIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
       <circle
@@ -36,7 +46,7 @@ export function BacklogIcon() {
   );
 }
 
-export function PausedIcon() {
+function PausedIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
       <circle
@@ -65,7 +75,7 @@ export function PausedIcon() {
   );
 }
 
-export const ToDoIcon: React.FC = () => {
+const ToDoIcon: React.FC = () => {
   return (
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
       <circle
@@ -94,7 +104,7 @@ export const ToDoIcon: React.FC = () => {
   );
 };
 
-export function InProgressIcon() {
+function InProgressIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
       <circle
@@ -123,7 +133,7 @@ export function InProgressIcon() {
   );
 }
 
-export function TechnicalReviewIcon() {
+function TechnicalReviewIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
       <circle
@@ -152,7 +162,7 @@ export function TechnicalReviewIcon() {
   );
 }
 
-export function CompletedIcon() {
+function CompletedIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
       <circle
@@ -175,30 +185,3 @@ export function CompletedIcon() {
     </svg>
   );
 }
-
-export const status: Status[] = [
-  {
-    id: "in-progress",
-    name: "In Progress",
-    color: "#facc15",
-    icon: InProgressIcon,
-  },
-  {
-    id: "technical-review",
-    name: "Technical Review",
-    color: "#22c55e",
-    icon: TechnicalReviewIcon,
-  },
-  { id: "completed", name: "Completed", color: "#8b5cf6", icon: CompletedIcon },
-  { id: "paused", name: "Paused", color: "#0ea5e9", icon: PausedIcon },
-  { id: "to-do", name: "Todo", color: "#f97316", icon: ToDoIcon },
-  { id: "backlog", name: "Backlog", color: "#ec4899", icon: BacklogIcon },
-];
-
-export const StatusIcon: React.FC<{ statusId: string }> = ({ statusId }) => {
-  const currentStatus = status.find((s) => s.id === statusId);
-  if (!currentStatus) return null;
-
-  const IconComponent = currentStatus.icon;
-  return <IconComponent />;
-};

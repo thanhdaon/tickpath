@@ -1,7 +1,9 @@
 "use client";
 
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { CheckIcon } from "lucide-react";
-import { useId, useState } from "react";
+import { useState } from "react";
+import { StatusIcon } from "~/components/issue/status-icon";
 import { Button } from "~/components/ui/button";
 import {
   Command,
@@ -16,37 +18,42 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "~/components/ui/popover";
-import { status as allStatus, Status } from "~/data/status";
+import { orpc } from "~/orpc/react-query";
 
 interface StatusSelectorProps {
-  status: Status;
+  statusId: string;
 }
 
-export function StatusSelector({ status }: StatusSelectorProps) {
-  const id = useId();
-  const [open, setOpen] = useState<boolean>(false);
-  const [value, setValue] = useState<string>(status.id);
+export function StatusSelector({ statusId }: StatusSelectorProps) {
+  const statuses = useSuspenseQuery(orpc.statuses.getAll.queryOptions());
+
+  const [value, setValue] = useState<string>(statusId);
+
+  if (statuses.isLoading) {
+    return null;
+  }
+
+  if (statuses.isError) {
+    return null;
+  }
+
+  const status = statuses.data.find((s) => s.id === statusId);
+
+  if (status === undefined) {
+    return null;
+  }
 
   return (
     <div className="*:not-first:mt-2">
-      <Popover open={open} onOpenChange={setOpen}>
+      <Popover>
         <PopoverTrigger asChild>
           <Button
-            id={id}
             className="size-7 flex items-center justify-center"
             size="icon"
             variant="ghost"
             role="combobox"
-            aria-expanded={open}
           >
-            {(() => {
-              const selectedItem = allStatus.find((item) => item.id === value);
-              if (selectedItem) {
-                const Icon = selectedItem.icon;
-                return <Icon />;
-              }
-              return null;
-            })()}
+            <StatusIcon statusId={status.id} />
           </Button>
         </PopoverTrigger>
         <PopoverContent
@@ -58,14 +65,14 @@ export function StatusSelector({ status }: StatusSelectorProps) {
             <CommandList>
               <CommandEmpty>No status found.</CommandEmpty>
               <CommandGroup>
-                {allStatus.map((item) => (
+                {statuses.data.map((item) => (
                   <CommandItem
                     key={item.id}
                     value={item.id}
                     className="flex items-center justify-between"
                   >
                     <div className="flex items-center gap-2">
-                      <item.icon />
+                      <StatusIcon statusId={item.id} />
                       {item.name}
                     </div>
                     {value === item.id && (

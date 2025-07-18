@@ -1,5 +1,7 @@
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { CheckIcon } from "lucide-react";
-import { useId, useState } from "react";
+import { useState } from "react";
+import { PriorityIcon } from "~/components/issue/priority-icon";
 import { Button } from "~/components/ui/button";
 import {
   Command,
@@ -14,23 +16,23 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "~/components/ui/popover";
-import { priorities, Priority } from "~/data/priorities";
+import { orpc } from "~/orpc/react-query";
 
 interface PrioritySelectorProps {
-  priority: Priority;
+  priorityId: string;
 }
 
-export function PrioritySelector({ priority }: PrioritySelectorProps) {
-  const id = useId();
-  const [value, setValue] = useState<string>(priority.id);
+export function PrioritySelector({ priorityId }: PrioritySelectorProps) {
+  const priorities = useSuspenseQuery(orpc.priorities.getAll.queryOptions());
 
-  function icon() {
-    const selectedItem = priorities.find((item) => item.id === value);
+  const [value, setValue] = useState<string>(priorityId);
 
-    if (selectedItem) {
-      const Icon = selectedItem.icon;
-      return <Icon className="text-muted-foreground size-4" />;
-    }
+  if (priorities.isLoading) {
+    return null;
+  }
+
+  if (priorities.isError) {
+    return null;
   }
 
   return (
@@ -38,12 +40,11 @@ export function PrioritySelector({ priority }: PrioritySelectorProps) {
       <Popover>
         <PopoverTrigger asChild>
           <Button
-            id={id}
             className="size-7 flex items-center justify-center"
             size="icon"
             variant="ghost"
           >
-            {icon()}
+            <PriorityIcon priorityId={value} />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="border-input w-full min-w-[var(--radix-popper-anchor-width)] p-0">
@@ -52,14 +53,17 @@ export function PrioritySelector({ priority }: PrioritySelectorProps) {
             <CommandList>
               <CommandEmpty>No priority found.</CommandEmpty>
               <CommandGroup>
-                {priorities.map((item) => (
+                {priorities.data.map((item) => (
                   <CommandItem
                     key={item.id}
                     value={item.id}
                     className="flex items-center justify-between"
                   >
                     <div className="flex items-center gap-2">
-                      <item.icon className="text-muted-foreground size-4" />
+                      <PriorityIcon
+                        priorityId={item.id}
+                        className="text-muted-foreground size-4"
+                      />
                       {item.name}
                     </div>
                     {value === item.id && (

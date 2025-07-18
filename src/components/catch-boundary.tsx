@@ -7,7 +7,7 @@ import {
   useRouter,
 } from "@tanstack/react-router";
 
-export function DefaultCatchBoundary({ error }: ErrorComponentProps) {
+export function CatchBoundary({ error }: ErrorComponentProps) {
   const router = useRouter();
   const isRoot = useMatch({
     strict: false,
