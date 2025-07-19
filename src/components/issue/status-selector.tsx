@@ -1,5 +1,3 @@
-"use client";
-
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { CheckIcon } from "lucide-react";
 import { useState } from "react";

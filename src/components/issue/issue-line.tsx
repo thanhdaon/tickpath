@@ -1,6 +1,6 @@
 import { format } from "date-fns";
 import { motion } from "motion/react";
-import { AssigneeUser } from "~/components/issue/assignee-user";
+import { AssigneeSelector } from "~/components/issue/assignee-selector";
 import { LabelBadge } from "~/components/issue/label-badge";
 import { PrioritySelector } from "~/components/issue/priority-selector";
 import { StatusSelector } from "~/components/issue/status-selector";
@@ -42,7 +42,7 @@ export function IssueLine({ issue }: IssueLineProps) {
         <span className="text-xs text-muted-foreground shrink-0 hidden sm:inline-block">
           {format(new Date(issue.createdAt), "MMM dd")}
         </span>
-        {/* <AssigneeUser userId={issue.assigneeId} /> */}
+        <AssigneeSelector issueId={issue.id} userId={issue.assigneeId} />
       </div>
     </motion.div>
   );

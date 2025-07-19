@@ -7,8 +7,8 @@ import { orpc } from "~/orpc/react-query";
 export const Route = createFileRoute("/")({
   component: Home,
   loader: async ({ context: { queryClient } }) => {
-    await queryClient.ensureQueryData(orpc.statuses.getAll.queryOptions());
     await queryClient.ensureQueryData(orpc.issues.getAll.queryOptions());
+    await queryClient.ensureQueryData(orpc.statuses.getAll.queryOptions());
     await queryClient.ensureQueryData(orpc.priorities.getAll.queryOptions());
     await queryClient.ensureQueryData(orpc.labels.getAll.queryOptions());
   },
@@ -17,13 +17,13 @@ export const Route = createFileRoute("/")({
 function Home() {
   const results = useSuspenseQueries({
     queries: [
-      orpc.statuses.getAll.queryOptions(),
       orpc.issues.getAll.queryOptions(),
+      orpc.statuses.getAll.queryOptions(),
       orpc.priorities.getAll.queryOptions(),
       orpc.labels.getAll.queryOptions(),
     ],
   });
-  const [statuses, issues] = results;
+  const [issues, statuses] = results;
 
   if (results.some((r) => r.isLoading)) {
     return <div>Loading...</div>;

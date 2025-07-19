@@ -2,15 +2,16 @@ import appCss from "~/styles/app.css?url";
 
 import { QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import {
   createRootRouteWithContext,
   HeadContent,
   Outlet,
   Scripts,
 } from "@tanstack/react-router";
+import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import type { ReactNode } from "react";
 import { ThemeProvider, useTheme } from "~/components/theme-provider";
+import { Toaster } from "~/components/ui/sonner";
 import { getThemeServerFn } from "~/lib/theme";
 
 type Context = {
@@ -56,6 +57,7 @@ function RootDocument({ children }: { children: ReactNode }) {
       </head>
       <body>
         {children}
+        <Toaster />
         <TanStackRouterDevtools position="bottom-right" />
         <ReactQueryDevtools buttonPosition="bottom-left" />
         <Scripts />

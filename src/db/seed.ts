@@ -1,13 +1,13 @@
 import { reset } from "drizzle-seed";
 import { db } from "~/db/db";
 import { faker } from "@faker-js/faker";
-import * as authSchema from "~/db/schema/auth";
-import * as othersSchema from "~/db/schema/others";
+import * as schema from "~/db/schema";
 
-const schema = { ...othersSchema, ...authSchema };
-
-type Issue = typeof schema.issues.$inferInsert;
-type IssueLabel = typeof schema.issuesLabels.$inferInsert;
+type Issue = typeof schema.issue.$inferInsert;
+type IssueLabel = typeof schema.issueToLabel.$inferInsert;
+type User = typeof schema.user.$inferInsert;
+type UserPresence = typeof schema.userPresence.$inferInsert;
+type UserToRole = typeof schema.userToRole.$inferInsert;
 
 const labels = [
   { id: "ui", name: "UI Enhancement", color: "purple" },
@@ -42,21 +42,61 @@ const statuses = [
   { id: "backlog", name: "Backlog", color: "#ec4899" },
 ];
 
+const roles = [
+  { id: "admin", name: "Admin" },
+  { id: "member", name: "Member" },
+  { id: "viewer", name: "Viewer" },
+];
+
 async function main() {
   await reset(db, schema);
 
-  await db.insert(schema.statuses).values(statuses);
-  await db.insert(schema.priorities).values(priorities);
-  await db.insert(schema.labels).values(labels);
-  await db.insert(schema.issues).values(generateIssues());
+  await db.insert(schema.status).values(statuses);
+  await db.insert(schema.priority).values(priorities);
+  await db.insert(schema.label).values(labels);
+  await db.insert(schema.userRole).values(roles);
 
-  const issues = await db.query.issues.findMany({ columns: { id: true } });
+  await db.insert(schema.user).values(generateUsers());
+  const users = await db.query.user.findMany({ columns: { id: true } });
+  const userIds = users.map((user) => user.id);
+
+  await db.insert(schema.userPresence).values(generateUserPresences(userIds));
+  await db.insert(schema.userToRole).values(generateUserToRoles(userIds));
+
+  await db.insert(schema.issue).values(generateIssues(userIds));
+  const issues = await db.query.issue.findMany({ columns: { id: true } });
   const issueIds = issues.map((issue) => issue.id);
 
-  await db.insert(schema.issuesLabels).values(generateIssueLabels(issueIds));
+  await db.insert(schema.issueToLabel).values(generateIssueLabels(issueIds));
 }
 
-function generateIssues(): Issue[] {
+function generateUsers(): User[] {
+  return Array.from({ length: 30 }, () => ({
+    id: faker.string.uuid(),
+    name: faker.person.fullName(),
+    email: faker.internet.email().toLowerCase(),
+    emailVerified: faker.datatype.boolean(),
+    image: faker.image.avatar(),
+    createdAt: faker.date.recent(),
+    updatedAt: faker.date.recent(),
+  }));
+}
+
+function generateUserPresences(userIds: string[]): UserPresence[] {
+  return userIds.map((userId) => ({
+    userId,
+    status: faker.helpers.arrayElement(["online", "away", "offline"]),
+  }));
+}
+
+function generateUserToRoles(userIds: string[]): UserToRole[] {
+  return userIds.map((userId) => ({
+    userId,
+    roleId: faker.helpers.arrayElement(roles.map((r) => r.id)),
+  }));
+}
+
+function generateIssues(userIds: string[]): Issue[] {
   return Array.from({ length: 20 }, () => ({
     title: faker.lorem.words({ min: 3, max: 5 }),
     description: faker.lorem.words({ min: 3, max: 10 }),
@@ -64,6 +104,7 @@ function generateIssues(): Issue[] {
     priorityId: faker.helpers.arrayElement(priorities.map((p) => p.id)),
     identifier: generateIssueIdentifier(),
     createdAt: faker.date.recent(),
+    assigneeId: faker.helpers.arrayElement(userIds),
   }));
 }
 
