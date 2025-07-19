@@ -71,7 +71,7 @@ async function main() {
 }
 
 function generateUsers(): User[] {
-  return Array.from({ length: 30 }, () => ({
+  return Array.from({ length: 6 }, () => ({
     id: faker.string.uuid(),
     name: faker.person.fullName(),
     email: faker.internet.email().toLowerCase(),
@@ -97,7 +97,7 @@ function generateUserToRoles(userIds: string[]): UserToRole[] {
 }
 
 function generateIssues(userIds: string[]): Issue[] {
-  return Array.from({ length: 20 }, () => ({
+  return Array.from({ length: 8 }, () => ({
     title: faker.lorem.words({ min: 3, max: 5 }),
     description: faker.lorem.words({ min: 3, max: 10 }),
     statusId: faker.helpers.arrayElement(statuses.map((s) => s.id)),

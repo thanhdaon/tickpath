@@ -93,7 +93,7 @@ export function AssigneeSelector({ issueId, userId }: AssigneeSelectorProps) {
           </div>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <ScrollArea className="h-[260px]">{renderAssigneeOptions()}</ScrollArea>
+        <ScrollArea className="h-[200px]">{renderAssigneeOptions()}</ScrollArea>
       </DropdownMenuContent>
     </DropdownMenu>
   );
