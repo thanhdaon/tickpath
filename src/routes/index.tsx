@@ -2,6 +2,7 @@ import { useSuspenseQueries } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { GroupIssues } from "~/components/issue/group-issues";
 import { MainLayout } from "~/components/layout/main-layout";
+import { ScrollArea } from "~/components/ui/scroll-area";
 import { orpc } from "~/orpc/react-query";
 
 export const Route = createFileRoute("/")({
@@ -35,7 +36,7 @@ function Home() {
 
   return (
     <MainLayout>
-      <div className="w-full h-full">
+      <ScrollArea className="w-full h-[calc(100svh-60px)]">
         {statuses.data.map((s) => {
           const targetIssues = issues.data.filter((i) => i.statusId === s.id);
 
@@ -48,7 +49,7 @@ function Home() {
             />
           );
         })}
-      </div>
+      </ScrollArea>
     </MainLayout>
   );
 }
