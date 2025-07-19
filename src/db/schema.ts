@@ -1,16 +1,15 @@
-import { relations, sql } from "drizzle-orm";
+import { relations } from "drizzle-orm";
 import {
   bigint,
   boolean,
-  datetime,
-  mysqlTable,
+  pgTable,
   primaryKey,
   text,
   timestamp,
   varchar,
-} from "drizzle-orm/mysql-core";
+} from "drizzle-orm/pg-core";
 
-export const user = mysqlTable("user", {
+export const user = pgTable("user", {
   id: varchar("id", { length: 36 }).primaryKey(),
   name: text("name").notNull(),
   email: varchar("email", { length: 255 }).notNull().unique(),
@@ -36,7 +35,7 @@ export const userRelations = relations(user, ({ one, many }) => ({
   roles: many(userToRole),
 }));
 
-export const session = mysqlTable("session", {
+export const session = pgTable("session", {
   id: varchar("id", { length: 36 }).primaryKey(),
   expiresAt: timestamp("expires_at").notNull(),
   token: varchar("token", { length: 255 }).notNull().unique(),
@@ -56,7 +55,7 @@ export const sessionRelations = relations(session, ({ one }) => ({
   }),
 }));
 
-export const account = mysqlTable("account", {
+export const account = pgTable("account", {
   id: varchar("id", { length: 36 }).primaryKey(),
   accountId: text("account_id").notNull(),
   providerId: text("provider_id").notNull(),
@@ -81,7 +80,7 @@ export const accountRelations = relations(account, ({ one }) => ({
   }),
 }));
 
-export const verification = mysqlTable("verification", {
+export const verification = pgTable("verification", {
   id: varchar("id", { length: 36 }).primaryKey(),
   identifier: text("identifier").notNull(),
   value: text("value").notNull(),
@@ -90,8 +89,8 @@ export const verification = mysqlTable("verification", {
   updatedAt: timestamp("updated_at").$defaultFn(() => new Date()),
 });
 
-export const issue = mysqlTable("issue", {
-  id: bigint({ mode: "number", unsigned: true }).primaryKey().autoincrement(),
+export const issue = pgTable("issue", {
+  id: bigint({ mode: "number" }).primaryKey().generatedAlwaysAsIdentity(),
   identifier: varchar({ length: 50 }).notNull(),
   title: text().notNull(),
   description: text(),
@@ -102,9 +101,9 @@ export const issue = mysqlTable("issue", {
   priorityId: varchar({ length: 50 })
     .notNull()
     .references(() => priority.id),
-  createdAt: datetime()
+  createdAt: timestamp()
     .notNull()
-    .default(sql`CURRENT_TIMESTAMP`),
+    .$defaultFn(() => new Date()),
 });
 
 export const issueRelations = relations(issue, ({ one, many }) => ({
@@ -123,10 +122,10 @@ export const issueRelations = relations(issue, ({ one, many }) => ({
   labels: many(issueToLabel),
 }));
 
-export const issueToLabel = mysqlTable(
+export const issueToLabel = pgTable(
   "issue_to_label",
   {
-    issueId: bigint({ mode: "number", unsigned: true })
+    issueId: bigint({ mode: "number" })
       .references(() => issue.id, { onDelete: "cascade" })
       .notNull(),
     labelId: varchar({ length: 50 })
@@ -147,7 +146,7 @@ export const issueToLabelRelations = relations(issueToLabel, ({ one }) => ({
   }),
 }));
 
-export const status = mysqlTable("status", {
+export const status = pgTable("status", {
   id: varchar({ length: 50 }).primaryKey(),
   name: varchar({ length: 50 }).notNull(),
   color: varchar({ length: 50 }).notNull(),
@@ -157,7 +156,7 @@ export const statusRelations = relations(status, ({ many }) => ({
   issues: many(issue),
 }));
 
-export const label = mysqlTable("label", {
+export const label = pgTable("label", {
   id: varchar({ length: 50 }).primaryKey(),
   name: varchar({ length: 100 }).notNull(),
   color: varchar({ length: 50 }).notNull(),
@@ -167,7 +166,7 @@ export const labelRelations = relations(label, ({ many }) => ({
   issues: many(issueToLabel),
 }));
 
-export const priority = mysqlTable("priority", {
+export const priority = pgTable("priority", {
   id: varchar({ length: 50 }).primaryKey(),
   name: varchar({ length: 100 }).notNull(),
 });
@@ -176,14 +175,14 @@ export const priorityRelations = relations(priority, ({ many }) => ({
   issues: many(issue),
 }));
 
-export const userPresence = mysqlTable("user_presence", {
+export const userPresence = pgTable("user_presence", {
   userId: varchar({ length: 36 })
     .references(() => user.id, { onDelete: "cascade" })
     .primaryKey(),
   status: varchar({ length: 10, enum: ["online", "away", "offline"] })
     .notNull()
     .default("offline"),
-  lastUpdatedAt: datetime()
+  lastUpdatedAt: timestamp()
     .notNull()
     .$onUpdateFn(() => new Date()),
 });
@@ -195,7 +194,7 @@ export const userPresenceRelations = relations(userPresence, ({ one }) => ({
   }),
 }));
 
-export const userRole = mysqlTable("user_role", {
+export const userRole = pgTable("user_role", {
   id: varchar({ length: 50 }).primaryKey(),
   name: varchar({ length: 100 }).notNull(),
 });
@@ -204,7 +203,7 @@ export const userRoleRelations = relations(userRole, ({ many }) => ({
   users: many(userToRole),
 }));
 
-export const userToRole = mysqlTable(
+export const userToRole = pgTable(
   "user_to_role",
   {
     userId: varchar({ length: 36 })
