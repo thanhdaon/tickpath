@@ -8,7 +8,7 @@
     "db:push": "drizzle-kit push --config src/db/drizzle.config.ts",
     "db:generate": "drizzle-kit generate --config src/db/drizzle.config.ts",
     "db:reset": "drizzle-kit reset --config src/db/drizzle.config.ts",
-    "db:studio": "drizzle-kit studio --config src/db/drizzle.config.ts --verbose ",
+    "db:studio": "drizzle-kit studio --config src/db/drizzle.config.ts",
     "db:seed": "tsx --env-file=.env src/db/seed.ts",
     "auth:generate": "npx @better-auth/cli generate --config src/lib/auth.ts"
   },
