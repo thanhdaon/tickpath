@@ -8,9 +8,6 @@ importers:
 
   .:
     dependencies:
-      '@kayron013/lexorank':
-        specifier: ^2.0.0
-        version: 2.0.0
       '@neondatabase/serverless':
         specifier: ^1.0.1
         version: 1.0.1
@@ -840,9 +837,6 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.29':
     resolution: {integrity: sha512-uw6guiW/gcAGPDhLmd77/6lW8QLeiV5RUTsAX46Db6oLhGaVj4lhnPwb184s1bkc8kdVg/+h988dro8GRDpmYQ==}
-
-  '@kayron013/lexorank@2.0.0':
-    resolution: {integrity: sha512-acQaZPjnsHnXm28i6YATdi/nZ3gs2c5ZFlkFhXcSw0CgDymF+U5v4SYcQT0/ryjBcEjKl1HQWpBLK+PtVOIAHA==}
 
   '@levischuck/tiny-cbor@0.2.11':
     resolution: {integrity: sha512-llBRm4dT4Z89aRsm6u2oEZ8tfwL/2l6BwpZ7JcyieouniDECM5AqNgr/y08zalEIvW3RSK4upYyybDcmjXqAow==}
@@ -5119,8 +5113,6 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.4
-
-  '@kayron013/lexorank@2.0.0': {}
 
   '@levischuck/tiny-cbor@0.2.11': {}
 

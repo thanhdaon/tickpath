@@ -15,7 +15,6 @@
   "license": "ISC",
   "packageManager": "pnpm@10.13.1",
   "dependencies": {
-    "@kayron013/lexorank": "^2.0.0",
     "@neondatabase/serverless": "^1.0.1",
     "@orpc/client": "^1.7.4",
     "@orpc/server": "^1.7.4",
