@@ -1,11 +1,13 @@
 import { os } from "@orpc/server";
-import { eq } from "drizzle-orm";
+import { asc, desc, eq } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "~/db/db";
-import { issue } from "~/db/schema";
+import { issue, label, priority, status, user } from "~/db/schema";
 
 const getAllStatuses = os.handler(async () => {
-  return await db.query.status.findMany();
+  return await db.query.status.findMany({
+    orderBy: [asc(status.id)],
+  });
 });
 
 const getAllIssues = os.handler(async () => {
@@ -17,6 +19,7 @@ const getAllIssues = os.handler(async () => {
         },
       },
     },
+    orderBy: [desc(issue.updatedAt)],
   });
 
   return result.map((issue) => ({
@@ -26,11 +29,15 @@ const getAllIssues = os.handler(async () => {
 });
 
 const getAllPriorities = os.handler(async () => {
-  return await db.query.priority.findMany();
+  return await db.query.priority.findMany({
+    orderBy: [asc(priority.id)],
+  });
 });
 
 const getAllLabels = os.handler(async () => {
-  return await db.query.label.findMany();
+  return await db.query.label.findMany({
+    orderBy: [asc(label.name)],
+  });
 });
 
 const getAllUsers = os.handler(async () => {
@@ -47,6 +54,7 @@ const getAllUsers = os.handler(async () => {
         },
       },
     },
+    orderBy: [desc(user.id)],
   });
 
   return results.map((user) => ({
@@ -68,6 +76,56 @@ const updateIssueAssignee = os
       .where(eq(issue.id, input.issueId));
   });
 
+const updateIssueStatus = os
+  .input(z.object({ issueId: z.number(), statusId: z.string() }))
+  .handler(async ({ input }) => {
+    const foundIssue = await db.query.issue.findFirst({
+      where: eq(issue.id, input.issueId),
+    });
+
+    if (foundIssue === undefined) {
+      throw new Error(`issue ${input.issueId} not found`);
+    }
+
+    const foundStatus = await db.query.status.findFirst({
+      where: eq(status.id, input.statusId),
+    });
+
+    if (foundStatus === undefined) {
+      throw new Error(`status ${input.statusId} not found`);
+    }
+
+    await db
+      .update(issue)
+      .set({ statusId: input.statusId })
+      .where(eq(issue.id, input.issueId));
+  });
+
+const updateIssuePriority = os
+  .input(z.object({ issueId: z.number(), priorityId: z.string() }))
+  .handler(async ({ input }) => {
+    const foundIssue = await db.query.issue.findFirst({
+      where: eq(issue.id, input.issueId),
+    });
+
+    if (foundIssue === undefined) {
+      throw new Error(`issue ${input.issueId} not found`);
+    }
+
+    const foundPriority = await db.query.priority.findFirst({
+      where: eq(priority.id, input.priorityId),
+    });
+
+    if (foundPriority === undefined) {
+      throw new Error(`priority ${input.priorityId} not found`);
+    }
+
+    await db
+      .update(issue)
+      .set({ priorityId: input.priorityId })
+      .where(eq(issue.id, input.issueId));
+  });
+
 export const router = {
   statuses: {
     getAll: getAllStatuses,
@@ -75,6 +133,8 @@ export const router = {
   issues: {
     getAll: getAllIssues,
     updateAssignee: updateIssueAssignee,
+    updateStatus: updateIssueStatus,
+    updatePriority: updateIssuePriority,
   },
   priorities: {
     getAll: getAllPriorities,

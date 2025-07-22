@@ -1,6 +1,10 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQueryClient,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
 import { CheckIcon } from "lucide-react";
-import { useState } from "react";
+import { toast } from "sonner";
 import { PriorityIcon } from "~/components/issue/priority-icon";
 import { Button } from "~/components/ui/button";
 import {
@@ -18,14 +22,14 @@ import {
 } from "~/components/ui/popover";
 import { orpc } from "~/orpc/react-query";
 
-interface PrioritySelectorProps {
+interface Props {
+  issueId: number;
   priorityId: string;
 }
 
-export function PrioritySelector({ priorityId }: PrioritySelectorProps) {
+export function PrioritySelector({ issueId, priorityId }: Props) {
   const priorities = useSuspenseQuery(orpc.priorities.getAll.queryOptions());
-
-  const [value, setValue] = useState<string>(priorityId);
+  const mutation = useIssuePriorityMutation();
 
   if (priorities.isLoading) {
     return null;
@@ -44,7 +48,7 @@ export function PrioritySelector({ priorityId }: PrioritySelectorProps) {
             size="icon"
             variant="ghost"
           >
-            <PriorityIcon priorityId={value} />
+            <PriorityIcon priorityId={priorityId} />
           </Button>
         </PopoverTrigger>
         <PopoverContent
@@ -60,7 +64,9 @@ export function PrioritySelector({ priorityId }: PrioritySelectorProps) {
                   <CommandItem
                     key={item.id}
                     value={item.id}
-                    className="flex items-center justify-between"
+                    onSelect={() => {
+                      mutation.mutate({ issueId, priorityId: item.id });
+                    }}
                   >
                     <div className="flex items-center gap-2">
                       <PriorityIcon
@@ -69,7 +75,7 @@ export function PrioritySelector({ priorityId }: PrioritySelectorProps) {
                       />
                       {item.name}
                     </div>
-                    {value === item.id && (
+                    {priorityId === item.id && (
                       <CheckIcon size={16} className="ml-auto" />
                     )}
                     <span className="text-muted-foreground text-xs">10</span>
@@ -82,4 +88,21 @@ export function PrioritySelector({ priorityId }: PrioritySelectorProps) {
       </Popover>
     </div>
   );
+}
+
+function useIssuePriorityMutation() {
+  const queryClient = useQueryClient();
+
+  const mutationOptions = orpc.issues.updatePriority.mutationOptions({
+    onSuccess: () => {
+      queryClient.invalidateQueries(orpc.issues.getAll.queryOptions());
+    },
+    onError: (error) => {
+      toast.error("Failed to update priority", {
+        description: error.message,
+      });
+    },
+  });
+
+  return useMutation(mutationOptions);
 }

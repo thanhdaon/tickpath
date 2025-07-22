@@ -101,28 +101,19 @@ export function AssigneeSelector({ issueId, userId }: AssigneeSelectorProps) {
 function useAssigneeMutation() {
   const queryClient = useQueryClient();
 
-  const mutation = useMutation(
-    orpc.issues.updateAssignee.mutationOptions({
-      onMutate() {
-        const toastId = toast.loading("Assigning issue...");
-        return { toastId };
-      },
-      onSettled(data, error, variables, context) {
-        toast.dismiss(context?.toastId);
-      },
-      async onSuccess() {
-        await queryClient.invalidateQueries({
-          queryKey: orpc.issues.getAll.queryKey(),
-        });
-        toast.success("Issue assigned successfully");
-      },
-      onError(error) {
-        toast.error("Failed to assign issue", {
-          description: error.message,
-        });
-      },
-    })
-  );
+  const mutationOptions = orpc.issues.updateAssignee.mutationOptions({
+    async onSuccess() {
+      await queryClient.invalidateQueries({
+        queryKey: orpc.issues.getAll.queryKey(),
+      });
+      toast.success("Issue assigned successfully");
+    },
+    onError(error) {
+      toast.error("Failed to assign issue", {
+        description: error.message,
+      });
+    },
+  });
 
-  return mutation;
+  return useMutation(mutationOptions);
 }

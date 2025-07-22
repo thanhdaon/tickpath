@@ -23,11 +23,11 @@ export function IssueLine({ issue }: IssueLineProps) {
   return (
     <motion.div className="w-full flex items-center justify-start h-11 px-6 hover:bg-sidebar/50">
       <div className="flex items-center gap-0.5">
-        <PrioritySelector priorityId={issue.priorityId} />
-        <span className="text-sm hidden sm:inline-block text-muted-foreground font-medium w-[80px] truncate shrink-0 mr-0.5">
+        <PrioritySelector issueId={issue.id} priorityId={issue.priorityId} />
+        <span className="text-sm hidden sm:inline-block text-muted-foreg rounded-md font-medium w-[80px] truncate shrink-0 mr-0.5">
           {issue.identifier}
         </span>
-        <StatusSelector statusId={issue.statusId} />
+        <StatusSelector issueId={issue.id} statusId={issue.statusId} />
       </div>
       <span className="min-w-0 flex items-center justify-start mr-1 ml-0.5">
         <span className="text-xs sm:text-sm font-medium sm:font-semibold truncate">

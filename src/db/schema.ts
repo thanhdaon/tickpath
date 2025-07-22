@@ -104,6 +104,9 @@ export const issue = pgTable("issue", {
   createdAt: timestamp()
     .notNull()
     .$defaultFn(() => new Date()),
+  updatedAt: timestamp()
+    .notNull()
+    .$onUpdateFn(() => new Date()),
 });
 
 export const issueRelations = relations(issue, ({ one, many }) => ({
