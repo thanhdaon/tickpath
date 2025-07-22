@@ -9,10 +9,17 @@ export default defineConfig({
   server: {
     port: 3000,
   },
+  optimizeDeps: {
+    exclude: ["@tanstack/react-router-devtools"],
+  },
   plugins: [
     tsConfigPaths(),
     tanstackStart({ customViteReactPlugin: true, target: "vercel" }),
     tailwindcss(),
-    viteReact(),
+    viteReact({
+      babel: {
+        plugins: ["babel-plugin-react-compiler"],
+      },
+    }),
   ],
 });
