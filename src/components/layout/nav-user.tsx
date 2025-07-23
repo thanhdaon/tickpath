@@ -1,3 +1,4 @@
+import { useNavigate } from "@tanstack/react-router";
 import {
   BadgeCheck,
   Bell,
@@ -23,6 +24,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "~/components/ui/sidebar";
+import { signOut } from "~/lib/auth-client";
 
 export function NavUser({
   user,
@@ -96,13 +98,31 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <LogOut />
-              Log out
-            </DropdownMenuItem>
+            <LogoutMenuItem />
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>
+  );
+}
+
+function LogoutMenuItem() {
+  const navigate = useNavigate();
+
+  function onClick() {
+    signOut()
+      .then(() => {
+        navigate({ to: "/signin" });
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
+
+  return (
+    <DropdownMenuItem onClick={onClick}>
+      <LogOut />
+      Log out
+    </DropdownMenuItem>
   );
 }

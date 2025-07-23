@@ -7,15 +7,19 @@ import {
   HeadContent,
   Outlet,
   Scripts,
+  useRouteContext,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import type { ReactNode } from "react";
 import { ThemeProvider, useTheme } from "~/components/theme-provider";
 import { Toaster } from "~/components/ui/sonner";
 import { getThemeServerFn } from "~/lib/theme";
+import { Session, User } from "~/lib/auth";
 
 type Context = {
   queryClient: QueryClient;
+  session?: Session;
+  user?: User;
 };
 
 export const Route = createRootRouteWithContext<Context>()({

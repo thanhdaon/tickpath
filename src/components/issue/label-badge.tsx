@@ -17,7 +17,8 @@ export function LabelBadge({ labels }: LabelBadgeProps) {
 }
 
 function LabelBadgeItem({ labelId }: { labelId: string }) {
-  const result = useSuspenseQuery(orpc.labels.getAll.queryOptions());
+  const options = orpc.labels.getAll.queryOptions({ staleTime: Infinity });
+  const result = useSuspenseQuery(options);
 
   if (result.isLoading) {
     return null;

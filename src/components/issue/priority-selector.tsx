@@ -28,7 +28,8 @@ interface Props {
 }
 
 export function PrioritySelector({ issueId, priorityId }: Props) {
-  const priorities = useSuspenseQuery(orpc.priorities.getAll.queryOptions());
+  const options = orpc.priorities.getAll.queryOptions({ staleTime: Infinity });
+  const priorities = useSuspenseQuery(options);
   const mutation = useIssuePriorityMutation();
 
   if (priorities.isLoading) {

@@ -17,7 +17,6 @@ import {
 import { ScrollArea } from "~/components/ui/scroll-area";
 import { Skeleton } from "~/components/ui/skeleton";
 import { orpc } from "~/orpc/react-query";
-import { Button } from "~/components/ui/button";
 
 interface AssigneeSelectorProps {
   issueId: number;
@@ -25,7 +24,8 @@ interface AssigneeSelectorProps {
 }
 
 export function AssigneeSelector({ issueId, userId }: AssigneeSelectorProps) {
-  const users = useSuspenseQuery(orpc.users.getAll.queryOptions());
+  const options = orpc.users.getAll.queryOptions({ staleTime: Infinity });
+  const users = useSuspenseQuery(options);
   const changeAssignee = useAssigneeMutation();
 
   function renderAssignee() {

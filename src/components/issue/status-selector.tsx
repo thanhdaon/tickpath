@@ -28,7 +28,8 @@ interface StatusSelectorProps {
 }
 
 export function StatusSelector({ issueId, statusId }: StatusSelectorProps) {
-  const statuses = useSuspenseQuery(orpc.statuses.getAll.queryOptions());
+  const options = orpc.statuses.getAll.queryOptions({ staleTime: Infinity });
+  const statuses = useSuspenseQuery(options);
   const mutation = useIssueStatusMutation();
 
   if (statuses.isLoading) {
