@@ -1,16 +1,22 @@
-import { os } from "@orpc/server";
+import { onError, os } from "@orpc/server";
 import { asc, desc, eq } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "~/db/db";
 import { issue, label, priority, status, user } from "~/db/schema";
 
-const getAllStatuses = os.handler(async () => {
+const base = os.use(
+  onError((error) => {
+    console.error(error);
+  })
+);
+
+const getAllStatuses = base.handler(async () => {
   return await db.query.status.findMany({
     orderBy: [asc(status.id)],
   });
 });
 
-const getAllIssues = os.handler(async () => {
+const getAllIssues = base.handler(async () => {
   const result = await db.query.issue.findMany({
     with: {
       labels: {
@@ -28,19 +34,19 @@ const getAllIssues = os.handler(async () => {
   }));
 });
 
-const getAllPriorities = os.handler(async () => {
+const getAllPriorities = base.handler(async () => {
   return await db.query.priority.findMany({
     orderBy: [asc(priority.id)],
   });
 });
 
-const getAllLabels = os.handler(async () => {
+const getAllLabels = base.handler(async () => {
   return await db.query.label.findMany({
     orderBy: [asc(label.name)],
   });
 });
 
-const getAllUsers = os.handler(async () => {
+const getAllUsers = base.handler(async () => {
   const results = await db.query.user.findMany({
     with: {
       presence: {
@@ -62,12 +68,12 @@ const getAllUsers = os.handler(async () => {
     name: user.name,
     email: user.email,
     image: user.image,
-    status: user.presence.status,
+    status: user?.presence?.status,
     roles: user.roles.map((role) => role.roleId),
   }));
 });
 
-const updateIssueAssignee = os
+const updateIssueAssignee = base
   .input(z.object({ issueId: z.number(), userId: z.string().nullable() }))
   .handler(async ({ input }) => {
     await db
@@ -76,7 +82,7 @@ const updateIssueAssignee = os
       .where(eq(issue.id, input.issueId));
   });
 
-const updateIssueStatus = os
+const updateIssueStatus = base
   .input(z.object({ issueId: z.number(), statusId: z.string() }))
   .handler(async ({ input }) => {
     const foundIssue = await db.query.issue.findFirst({
@@ -101,7 +107,7 @@ const updateIssueStatus = os
       .where(eq(issue.id, input.issueId));
   });
 
-const updateIssuePriority = os
+const updateIssuePriority = base
   .input(z.object({ issueId: z.number(), priorityId: z.string() }))
   .handler(async ({ input }) => {
     const foundIssue = await db.query.issue.findFirst({

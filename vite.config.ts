@@ -14,8 +14,11 @@ export default defineConfig({
   },
   plugins: [
     tsConfigPaths(),
-    tanstackStart({ customViteReactPlugin: true, target: "vercel" }),
     tailwindcss(),
+    tanstackStart({
+      customViteReactPlugin: true,
+      target: "vercel",
+    }),
     viteReact({
       babel: {
         plugins: ["babel-plugin-react-compiler"],

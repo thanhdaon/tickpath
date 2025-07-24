@@ -1,5 +1,8 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { Button } from "~/components/ui/button";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { FormEvent } from "react";
+import { toast } from "sonner";
+import z from "zod";
+import { useAppForm } from "~/components/form/form";
 import {
   Card,
   CardContent,
@@ -7,8 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
-import { Input } from "~/components/ui/input";
-import { Label } from "~/components/ui/label";
+import { signUp } from "~/lib/auth-client";
 
 export const Route = createFileRoute("/_auth/signup")({
   component: SignupPage,
@@ -26,45 +28,93 @@ function SignupPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form>
-              <div className="grid gap-6">
-                <div className="grid gap-6">
-                  <div className="grid gap-3">
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="m@example.com"
-                      required
-                    />
-                  </div>
-                  <div className="grid gap-3">
-                    <div className="flex items-center">
-                      <Label htmlFor="password">Password</Label>
-                    </div>
-                    <Input id="password" type="password" required />
-                  </div>
-                  <div className="grid gap-3">
-                    <div className="flex items-center">
-                      <Label htmlFor="confirmPassword">Confirm Password</Label>
-                    </div>
-                    <Input id="confirmPassword" type="password" required />
-                  </div>
-                  <Button type="submit" className="w-full">
-                    Login
-                  </Button>
-                </div>
-                <div className="text-center text-sm">
-                  Already have an account?{" "}
-                  <Link to="/signin" className="underline underline-offset-4">
-                    Sign in
-                  </Link>
-                </div>
-              </div>
-            </form>
+            <SignupForm />
+            <div className="text-center text-sm mt-6">
+              Already have an account?{" "}
+              <Link to="/signin" className="underline underline-offset-4">
+                Sign in
+              </Link>
+            </div>
           </CardContent>
         </Card>
       </div>
     </div>
   );
+}
+
+const FormSchema = z.object({
+  email: z.email("Invalid email address"),
+  name: z.string().min(1, "Name is required"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+  confirmPassword: z.string().min(8, "Password must be at least 8 characters"),
+});
+
+function SignupForm() {
+  const navigate = useNavigate();
+
+  const form = useAppForm({
+    defaultValues: {
+      email: "",
+      name: "",
+      password: "",
+      confirmPassword: "",
+    },
+    validators: {
+      onSubmit: FormSchema,
+    },
+    onSubmit: async ({ value }) => {
+      await signupWithEmail(value);
+      navigate({ to: "/signin" });
+    },
+  });
+
+  function onSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    form.handleSubmit();
+  }
+
+  return (
+    <form onSubmit={onSubmit} className="grid gap-6">
+      <form.AppField
+        name="email"
+        children={(f) => <f.TextField label="Email" type="email" />}
+      />
+      <form.AppField
+        name="name"
+        children={(f) => <f.TextField label="Name" />}
+      />
+      <form.AppField
+        name="password"
+        children={(f) => <f.TextField label="Password" type="password" />}
+      />
+      <form.AppField
+        name="confirmPassword"
+        children={(f) => (
+          <f.TextField label="Confirm Password" type="password" />
+        )}
+      />
+      <form.AppForm>
+        <form.SubmitButton label="Sign up" className="cursor-pointer" />
+      </form.AppForm>
+    </form>
+  );
+}
+
+async function signupWithEmail(values: z.infer<typeof FormSchema>) {
+  const { data, error } = await signUp.email({
+    email: values.email,
+    name: values.name,
+    password: values.password,
+  });
+
+  if (error) {
+    console.error(error);
+    toast.error(error.message);
+  }
+
+  if (data) {
+    toast.success("Account created successfully", {
+      description: `Please check your email ${data.user.email} for verification`,
+    });
+  }
 }

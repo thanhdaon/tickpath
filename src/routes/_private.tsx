@@ -23,6 +23,7 @@ function RouteComponent() {
   }
 
   if (session.data) {
+    console.log(session.data);
     return (
       <MainLayout>
         <Outlet />

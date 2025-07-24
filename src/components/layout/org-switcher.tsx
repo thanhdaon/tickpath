@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { ChevronsUpDown } from "lucide-react";
 import { ThemeToggle } from "~/components/layout/theme-toggle";
 import {
@@ -20,6 +20,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "~/components/ui/sidebar";
+import { signOut } from "~/lib/auth-client";
 
 export function OrgSwitcher() {
   return (
@@ -77,13 +78,27 @@ export function OrgSwitcher() {
               </DropdownMenuPortal>
             </DropdownMenuSub>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              Log out
-              <DropdownMenuShortcut>⌥⇧Q</DropdownMenuShortcut>
-            </DropdownMenuItem>
+            <SignoutMenuItem />
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>
+  );
+}
+
+function SignoutMenuItem() {
+  const navigate = useNavigate();
+
+  function onClick() {
+    signOut().then(() => {
+      navigate({ to: "/signin" });
+    });
+  }
+
+  return (
+    <DropdownMenuItem onClick={onClick}>
+      Log out
+      <DropdownMenuShortcut>⌥⇧Q</DropdownMenuShortcut>
+    </DropdownMenuItem>
   );
 }
