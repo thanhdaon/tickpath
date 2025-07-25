@@ -20,7 +20,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "~/components/ui/popover";
-import { orpc } from "~/orpc/react-query";
+import { orpc } from "~/orpc/client";
 
 interface StatusSelectorProps {
   issueId: number;

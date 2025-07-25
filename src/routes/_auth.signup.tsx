@@ -12,7 +12,7 @@ import {
 } from "~/components/ui/card";
 import { signUp } from "~/lib/auth-client";
 import { uploadFileWithSignedUrl } from "~/lib/s3-client";
-import { client } from "~/orpc/rpc-client";
+import { rpc } from "~/orpc/client";
 
 export const Route = createFileRoute("/_auth/signup")({
   component: SignupPage,
@@ -125,16 +125,16 @@ async function signupWithEmail(values: FormValues) {
     return;
   }
 
-  await client.users.createProfile({ userId: data.user.id });
+  await rpc.users.createProfile({ userId: data.user.id });
 
   if (values.avatar) {
-    const url = await client.files.generateUserAvatarUploadUrl({
+    const url = await rpc.files.generateUserAvatarUploadUrl({
       avatar: values.avatar,
     });
 
     await uploadFileWithSignedUrl(url.signedUrl, values.avatar);
 
-    const [file] = await client.files.add({
+    const [file] = await rpc.files.add({
       files: [
         {
           key: url.key,
@@ -147,7 +147,7 @@ async function signupWithEmail(values: FormValues) {
       ],
     });
 
-    await client.users.updateProfileAvatar({
+    await rpc.users.updateProfileAvatar({
       userId: data.user.id,
       avatarFileId: file.id,
     });

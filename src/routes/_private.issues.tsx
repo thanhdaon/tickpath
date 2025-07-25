@@ -2,7 +2,7 @@ import { useSuspenseQueries } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { GroupIssues } from "~/components/issue/group-issues";
 import { ScrollArea } from "~/components/ui/scroll-area";
-import { orpc } from "~/orpc/react-query";
+import { orpc } from "~/orpc/client";
 
 export const Route = createFileRoute("/_private/issues")({
   component: IssuePage,

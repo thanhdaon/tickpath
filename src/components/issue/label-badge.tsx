@@ -1,6 +1,6 @@
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { Badge } from "~/components/ui/badge";
-import { orpc } from "~/orpc/react-query";
+import { orpc } from "~/orpc/client";
 
 interface LabelBadgeProps {
   labels: string[];

@@ -16,7 +16,7 @@ import {
 } from "~/components/ui/dropdown-menu";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import { Skeleton } from "~/components/ui/skeleton";
-import { orpc } from "~/orpc/react-query";
+import { orpc } from "~/orpc/client";
 
 interface AssigneeSelectorProps {
   issueId: number;
