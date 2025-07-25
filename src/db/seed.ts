@@ -8,6 +8,7 @@ type IssueLabel = typeof schema.issueToLabel.$inferInsert;
 type User = typeof schema.user.$inferInsert;
 type UserPresence = typeof schema.userPresence.$inferInsert;
 type UserToRole = typeof schema.userToRole.$inferInsert;
+type UserProfile = typeof schema.userProfile.$inferInsert;
 
 const labels = [
   { id: "ui", name: "UI Enhancement", color: "purple" },
@@ -62,12 +63,17 @@ async function main() {
 
   await db.insert(schema.userPresence).values(generateUserPresences(userIds));
   await db.insert(schema.userToRole).values(generateUserToRoles(userIds));
+  await db.insert(schema.userProfile).values(generateUserProfiles(userIds));
 
   await db.insert(schema.issue).values(generateIssues(userIds));
   const issues = await db.query.issue.findMany({ columns: { id: true } });
   const issueIds = issues.map((issue) => issue.id);
 
   await db.insert(schema.issueToLabel).values(generateIssueLabels(issueIds));
+}
+
+function generateUserProfiles(userIds: string[]): UserProfile[] {
+  return userIds.map((userId) => ({ userId }));
 }
 
 function generateUsers(): User[] {

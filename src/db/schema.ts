@@ -2,8 +2,10 @@ import { relations } from "drizzle-orm";
 import {
   bigint,
   boolean,
+  integer,
   pgTable,
   primaryKey,
+  serial,
   text,
   timestamp,
   varchar,
@@ -33,6 +35,7 @@ export const userRelations = relations(user, ({ one, many }) => ({
     references: [userPresence.userId],
   }),
   roles: many(userToRole),
+  files: many(file),
 }));
 
 export const session = pgTable("session", {
@@ -227,5 +230,46 @@ export const userToRoleRelations = relations(userToRole, ({ one }) => ({
   userRole: one(userRole, {
     fields: [userToRole.roleId],
     references: [userRole.id],
+  }),
+}));
+
+export const userProfile = pgTable("user_profile", {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  userId: varchar({ length: 36 }).references(() => user.id, {
+    onDelete: "cascade",
+  }),
+  avatarFileId: bigint({ mode: "number" }).references(() => file.id),
+});
+
+export const userProfileRelations = relations(userProfile, ({ one }) => ({
+  user: one(user, {
+    fields: [userProfile.userId],
+    references: [user.id],
+  }),
+  avatar: one(file, {
+    fields: [userProfile.avatarFileId],
+    references: [file.id],
+  }),
+}));
+
+export const file = pgTable("file", {
+  id: bigint({ mode: "number" }).primaryKey().generatedAlwaysAsIdentity(),
+  key: text().notNull().unique(),
+  bucket: text().notNull(),
+  filename: text().notNull(),
+  mimeType: text().notNull(),
+  size: bigint({ mode: "number" }).notNull(),
+  uploadedByUserId: varchar({ length: 36 }).references(() => user.id, {
+    onDelete: "set null",
+  }),
+  uploadedAt: timestamp()
+    .notNull()
+    .$defaultFn(() => new Date()),
+});
+
+export const fileRelations = relations(file, ({ one }) => ({
+  uploadedBy: one(user, {
+    fields: [file.uploadedByUserId],
+    references: [user.id],
   }),
 }));

@@ -15,6 +15,8 @@
   "license": "ISC",
   "packageManager": "pnpm@10.13.1",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.850.0",
+    "@aws-sdk/s3-request-presigner": "^3.850.0",
     "@neondatabase/serverless": "^1.0.1",
     "@orpc/client": "^1.7.4",
     "@orpc/server": "^1.7.4",
@@ -58,6 +60,7 @@
     "@tailwindcss/vite": "^4.1.11",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
+    "@vitejs/plugin-react": "^4.7.0",
     "babel-plugin-react-compiler": "19.1.0-rc.2",
     "drizzle-kit": "^0.31.4",
     "drizzle-seed": "^0.3.1",
@@ -65,7 +68,6 @@
     "tw-animate-css": "^1.3.5",
     "typescript": "5.9.0-beta",
     "vite": "^7.0.5",
-    "vite-tsconfig-paths": "^5.1.4",
-    "@vitejs/plugin-react": "^4.7.0"
+    "vite-tsconfig-paths": "^5.1.4"
   }
 }

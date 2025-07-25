@@ -2,7 +2,16 @@ import { onError, os } from "@orpc/server";
 import { asc, desc, eq } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "~/db/db";
-import { issue, label, priority, status, user } from "~/db/schema";
+import {
+  file,
+  issue,
+  label,
+  priority,
+  status,
+  user,
+  userProfile,
+} from "~/db/schema";
+import { generateS3UserAvatarUploadUrl } from "~/lib/s3";
 
 const base = os.use(
   onError((error) => {
@@ -132,6 +141,52 @@ const updateIssuePriority = base
       .where(eq(issue.id, input.issueId));
   });
 
+const generateUserAvatarUploadUrl = base
+  .input(z.object({ avatar: z.instanceof(File) }))
+  .handler(async ({ input }) => {
+    return await generateS3UserAvatarUploadUrl(input.avatar);
+  });
+
+const fileSchema = z.object({
+  key: z.string(),
+  bucket: z.string(),
+  filename: z.string(),
+  mimeType: z.string(),
+  size: z.number(),
+  uploadedByUserId: z.string(),
+});
+
+const addFiles = base
+  .input(z.object({ files: fileSchema.array() }))
+  .handler(async ({ input: { files } }) => {
+    const results = await db.insert(file).values(files).returning({
+      id: file.id,
+      key: file.key,
+      bucket: file.bucket,
+      filename: file.filename,
+      mimeType: file.mimeType,
+      uploadedByUserId: file.uploadedByUserId,
+    });
+    return results;
+  });
+
+const createUserProfile = base
+  .input(z.object({ userId: z.string() }))
+  .handler(async ({ input }) => {
+    await db.insert(userProfile).values({
+      userId: input.userId,
+    });
+  });
+
+const updateUserProfileAvatar = base
+  .input(z.object({ userId: z.string(), avatarFileId: z.number() }))
+  .handler(async ({ input }) => {
+    await db
+      .update(userProfile)
+      .set({ avatarFileId: input.avatarFileId })
+      .where(eq(userProfile.userId, input.userId));
+  });
+
 export const router = {
   statuses: {
     getAll: getAllStatuses,
@@ -150,5 +205,11 @@ export const router = {
   },
   users: {
     getAll: getAllUsers,
+    createProfile: createUserProfile,
+    updateProfileAvatar: updateUserProfileAvatar,
+  },
+  files: {
+    generateUserAvatarUploadUrl,
+    add: addFiles,
   },
 };

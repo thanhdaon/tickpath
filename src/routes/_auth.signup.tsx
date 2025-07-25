@@ -11,6 +11,8 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { signUp } from "~/lib/auth-client";
+import { uploadFileWithSignedUrl } from "~/lib/s3-client";
+import { client } from "~/orpc/rpc-client";
 
 export const Route = createFileRoute("/_auth/signup")({
   component: SignupPage,
@@ -47,18 +49,24 @@ const FormSchema = z.object({
   name: z.string().min(1, "Name is required"),
   password: z.string().min(8, "Password must be at least 8 characters"),
   confirmPassword: z.string().min(8, "Password must be at least 8 characters"),
+  avatar: z.file().optional(),
 });
+
+type FormValues = z.infer<typeof FormSchema>;
 
 function SignupForm() {
   const navigate = useNavigate();
 
+  const defaultValues: FormValues = {
+    email: "test@test.com",
+    name: "test",
+    password: "test12345",
+    confirmPassword: "test12345",
+    avatar: undefined,
+  };
+
   const form = useAppForm({
-    defaultValues: {
-      email: "",
-      name: "",
-      password: "",
-      confirmPassword: "",
-    },
+    defaultValues,
     validators: {
       onSubmit: FormSchema,
     },
@@ -83,6 +91,7 @@ function SignupForm() {
         name="name"
         children={(f) => <f.TextField label="Name" />}
       />
+      <form.AppField name="avatar" children={(f) => <f.AvatarField />} />
       <form.AppField
         name="password"
         children={(f) => <f.TextField label="Password" type="password" />}
@@ -100,7 +109,7 @@ function SignupForm() {
   );
 }
 
-async function signupWithEmail(values: z.infer<typeof FormSchema>) {
+async function signupWithEmail(values: FormValues) {
   const { data, error } = await signUp.email({
     email: values.email,
     name: values.name,
@@ -108,13 +117,43 @@ async function signupWithEmail(values: z.infer<typeof FormSchema>) {
   });
 
   if (error) {
-    console.error(error);
     toast.error(error.message);
   }
 
-  if (data) {
-    toast.success("Account created successfully", {
-      description: `Please check your email ${data.user.email} for verification`,
+  if (data === null) {
+    toast.error("Failed to create account");
+    return;
+  }
+
+  await client.users.createProfile({ userId: data.user.id });
+
+  if (values.avatar) {
+    const url = await client.files.generateUserAvatarUploadUrl({
+      avatar: values.avatar,
+    });
+
+    await uploadFileWithSignedUrl(url.signedUrl, values.avatar);
+
+    const [file] = await client.files.add({
+      files: [
+        {
+          key: url.key,
+          bucket: url.bucket,
+          filename: values.avatar.name,
+          mimeType: values.avatar.type,
+          size: values.avatar.size,
+          uploadedByUserId: data.user.id,
+        },
+      ],
+    });
+
+    await client.users.updateProfileAvatar({
+      userId: data.user.id,
+      avatarFileId: file.id,
     });
   }
+
+  toast.success("Account created successfully", {
+    description: `Please check your email ${data.user.email} for verification`,
+  });
 }
