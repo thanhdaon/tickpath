@@ -6,6 +6,8 @@ export const env = createEnv({
     DATABASE_URL: z.url(),
     BETTER_AUTH_URL: z.url(),
     BETTER_AUTH_SECRET: z.string().min(10),
+    DISCORD_CLIENT_ID: z.string(),
+    DISCORD_CLIENT_SECRET: z.string(),
     S3_ACCESS_KEY_ID: z.string(),
     S3_SECRET_ACCESS_KEY: z.string(),
     S3_ENDPOINT: z.url(),

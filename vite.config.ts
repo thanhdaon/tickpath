@@ -11,6 +11,7 @@ export default defineConfig({
   },
   optimizeDeps: {
     exclude: ["@tanstack/react-router-devtools"],
+    include: ["@tanstack/react-store"],
   },
   plugins: [
     tsConfigPaths(),
