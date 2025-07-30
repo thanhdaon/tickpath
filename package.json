@@ -15,7 +15,7 @@
   "license": "ISC",
   "packageManager": "pnpm@10.13.1",
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.850.0",
+    "@aws-sdk/client-s3": "^3.856.0",
     "@aws-sdk/s3-request-presigner": "^3.850.0",
     "@neondatabase/serverless": "^1.0.1",
     "@orpc/client": "^1.7.4",
