@@ -45,7 +45,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "date-fns": "^4.1.0",
-    "drizzle-orm": "^0.44.3",
+    "drizzle-orm": "^0.44.6",
     "lucide-react": "^0.534.0",
     "motion": "^12.23.11",
     "react": "^19.1.0",
